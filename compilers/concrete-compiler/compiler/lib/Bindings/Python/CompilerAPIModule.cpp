@@ -923,6 +923,14 @@ void mlir::concretelang::python::populateCompilerAPISubmodule(
            [](CompilationOptions &options, int security_level) {
              options.optimizerConfig.security = security_level;
            })
+      .def("set_parameter_restrictions",
+           [](CompilationOptions &options, uint64_t log2_polynomial_size_min, uint64_t log2_polynomial_size_max,
+              uint64_t glwe_dimension_min, uint64_t glwe_dimension_max) {
+             options.optimizerConfig.parameter_restrictions.log2_polynomial_size_min = log2_polynomial_size_min;
+             options.optimizerConfig.parameter_restrictions.log2_polynomial_size_max = log2_polynomial_size_max;
+             options.optimizerConfig.parameter_restrictions.glwe_dimension_min = glwe_dimension_min;
+             options.optimizerConfig.parameter_restrictions.glwe_dimension_max = glwe_dimension_max;
+           })
       .def("set_v0_parameter",
            [](CompilationOptions &options, size_t glweDimension,
               size_t logPolynomialSize, size_t nSmall, size_t brLevel,

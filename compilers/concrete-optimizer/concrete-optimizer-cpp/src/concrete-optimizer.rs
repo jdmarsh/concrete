@@ -10,7 +10,7 @@ use concrete_optimizer::dag::operator::{
     self, FunctionTable, LevelledComplexity, OperatorIndex, Precision, Shape,
 };
 use concrete_optimizer::dag::unparametrized;
-use concrete_optimizer::optimization::config::{Config, SearchSpace};
+use concrete_optimizer::optimization::config::{Config, ParameterRestrictions, SearchSpace};
 use concrete_optimizer::optimization::dag::multi_parameters::keys_spec;
 use concrete_optimizer::optimization::dag::multi_parameters::keys_spec::CircuitSolution;
 use concrete_optimizer::optimization::dag::multi_parameters::optimize::MacroParameters;
@@ -127,7 +127,13 @@ fn optimize_bootstrap(precision: u64, noise_factor: f64, options: ffi::Options) 
 
     let sum_size = 1;
 
-    let search_space = SearchSpace::default(processing_unit);
+    let parameter_restrictions = ParameterRestrictions {
+        log2_polynomial_size_min: options.parameter_restrictions.log2_polynomial_size_min,
+        log2_polynomial_size_max: options.parameter_restrictions.log2_polynomial_size_max,
+        glwe_dimension_min: options.parameter_restrictions.glwe_dimension_min,
+        glwe_dimension_max: options.parameter_restrictions.glwe_dimension_max,
+    };
+    let search_space = SearchSpace::default(processing_unit, parameter_restrictions);
 
     let result = concrete_optimizer::optimization::atomic_pattern::optimize_one(
         sum_size,
@@ -577,7 +583,13 @@ impl Dag {
             complexity_model: &CpuComplexity::default(),
         };
 
-        let search_space = SearchSpace::default(processing_unit);
+        let parameter_restrictions = ParameterRestrictions {
+            log2_polynomial_size_min: options.parameter_restrictions.log2_polynomial_size_min,
+            log2_polynomial_size_max: options.parameter_restrictions.log2_polynomial_size_max,
+            glwe_dimension_min: options.parameter_restrictions.glwe_dimension_min,
+            glwe_dimension_max: options.parameter_restrictions.glwe_dimension_max,
+        };
+        let search_space = SearchSpace::default(processing_unit, parameter_restrictions);
 
         let encoding = options.encoding.into();
 
@@ -648,7 +660,13 @@ impl Dag {
             fft_precision: options.fft_precision,
             complexity_model: &CpuComplexity::default(),
         };
-        let search_space = SearchSpace::default(processing_unit);
+        let parameter_restrictions = ParameterRestrictions {
+            log2_polynomial_size_min: options.parameter_restrictions.log2_polynomial_size_min,
+            log2_polynomial_size_max: options.parameter_restrictions.log2_polynomial_size_max,
+            glwe_dimension_min: options.parameter_restrictions.glwe_dimension_min,
+            glwe_dimension_max: options.parameter_restrictions.glwe_dimension_max,
+        };
+        let search_space = SearchSpace::default(processing_unit, parameter_restrictions);
 
         let encoding = options.encoding.into();
         #[allow(clippy::wildcard_in_or_patterns)]
@@ -1098,6 +1116,15 @@ mod ffi {
 
     #[namespace = "concrete_optimizer"]
     #[derive(Debug, Clone, Copy)]
+    pub struct ParameterRestrictions {
+        pub log2_polynomial_size_min: u64,
+        pub log2_polynomial_size_max: u64,
+        pub glwe_dimension_min: u64,
+        pub glwe_dimension_max: u64,
+    }
+
+    #[namespace = "concrete_optimizer"]
+    #[derive(Debug, Clone, Copy)]
     pub struct Options {
         pub security_level: u64,
         pub maximum_acceptable_error_probability: f64,
@@ -1109,6 +1136,7 @@ mod ffi {
         pub cache_on_disk: bool,
         pub ciphertext_modulus_log: u32,
         pub fft_precision: u32,
+        pub parameter_restrictions: ParameterRestrictions,
     }
 
     #[namespace = "concrete_optimizer::dag"]

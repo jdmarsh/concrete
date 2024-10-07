@@ -35,7 +35,12 @@ concrete_optimizer::Options options_from_config(optimizer::Config config) {
       /* .encoding = */ config.encoding,
       /* .cache_on_disk = */ config.cache_on_disk,
       /* .ciphertext_modulus_log = */ config.ciphertext_modulus_log,
-      /* .fft_precision = */ config.fft_precision};
+      /* .fft_precision = */ config.fft_precision,
+      /* .parameter_restrictions = */ concrete_optimizer::ParameterRestrictions {
+        /* .log2_polynomial_size_min = */ config.parameter_restrictions.log2_polynomial_size_min,
+        /* .log2_polynomial_size_max = */ config.parameter_restrictions.log2_polynomial_size_max,
+        /* .glwe_dimension_min = */ config.parameter_restrictions.glwe_dimension_min,
+        /* .glwe_dimension_max = */ config.parameter_restrictions.glwe_dimension_max}};
   return options;
 }
 

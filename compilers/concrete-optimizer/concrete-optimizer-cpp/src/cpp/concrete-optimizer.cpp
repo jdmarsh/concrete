@@ -1134,6 +1134,16 @@ enum class MultiParamStrategy : ::std::uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_concrete_optimizer$MultiParamStrategy
 
+#ifndef CXXBRIDGE1_STRUCT_concrete_optimizer$ParameterRestrictions
+#define CXXBRIDGE1_STRUCT_concrete_optimizer$ParameterRestrictions
+struct ParameterRestrictions final {
+  ::std::uint64_t log2_polynomial_size_min;
+  ::std::uint64_t log2_polynomial_size_max;
+  ::std::uint64_t glwe_dimension_min;
+  ::std::uint64_t glwe_dimension_max;
+};
+#endif // CXXBRIDGE1_STRUCT_concrete_optimizer$ParameterRestrictions
+
 #ifndef CXXBRIDGE1_STRUCT_concrete_optimizer$Options
 #define CXXBRIDGE1_STRUCT_concrete_optimizer$Options
 struct Options final {
@@ -1147,6 +1157,7 @@ struct Options final {
   bool cache_on_disk;
   ::std::uint32_t ciphertext_modulus_log;
   ::std::uint32_t fft_precision;
+  ::concrete_optimizer::ParameterRestrictions parameter_restrictions;
 
   using IsRelocatable = ::std::true_type;
 };
