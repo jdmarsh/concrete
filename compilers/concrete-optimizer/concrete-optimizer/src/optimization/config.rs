@@ -1,7 +1,7 @@
 use crate::computing_cost::complexity_model::ComplexityModel;
 use crate::config;
 use crate::config::GpuPbsType;
-use crate::global_parameters::{Range, DEFAUT_DOMAINS};
+use crate::global_parameters::{Range, ParameterDomains};
 
 #[derive(Clone, Copy, Debug)]
 pub struct NoiseBoundConfig {
@@ -37,23 +37,11 @@ pub struct SearchSpace {
 }
 
 impl SearchSpace {
-    pub fn default_cpu(parameter_restrictions: ParameterRestrictions) -> Self {
-        let mut glwe_log_polynomial_sizes_range = DEFAUT_DOMAINS.glwe_pbs_constrained.log2_polynomial_size;
-        glwe_log_polynomial_sizes_range.start = std::cmp::max(glwe_log_polynomial_sizes_range.start,
-            parameter_restrictions.log2_polynomial_size_min);
-        glwe_log_polynomial_sizes_range.end = std::cmp::min(glwe_log_polynomial_sizes_range.end,
-            parameter_restrictions.log2_polynomial_size_max);
-        let glwe_log_polynomial_sizes: Vec<u64> = glwe_log_polynomial_sizes_range.as_vec();
-
-        let mut glwe_dimensions_range = DEFAUT_DOMAINS.glwe_pbs_constrained.glwe_dimension;
-        glwe_dimensions_range.start = std::cmp::max(glwe_dimensions_range.start,
-            parameter_restrictions.glwe_dimension_min);
-            glwe_dimensions_range.end = std::cmp::min(glwe_dimensions_range.end,
-            parameter_restrictions.glwe_dimension_max);
-        let glwe_dimensions: Vec<u64> = glwe_dimensions_range.as_vec();
-
-        let internal_lwe_dimensions: Vec<u64> = DEFAUT_DOMAINS.free_glwe.glwe_dimension.as_vec();
-        let levelled_only_lwe_dimensions = DEFAUT_DOMAINS.free_lwe;
+    pub fn default_cpu(parameter_domains: ParameterDomains) -> Self {
+        let glwe_log_polynomial_sizes: Vec<u64> = parameter_domains.glwe_pbs_constrained_cpu.log2_polynomial_size.as_vec();
+        let glwe_dimensions: Vec<u64> = parameter_domains.glwe_pbs_constrained_cpu.glwe_dimension.as_vec();
+        let internal_lwe_dimensions: Vec<u64> = parameter_domains.free_glwe.glwe_dimension.as_vec();
+        let levelled_only_lwe_dimensions = parameter_domains.free_lwe;
         Self {
             glwe_log_polynomial_sizes,
             glwe_dimensions,
@@ -62,14 +50,14 @@ impl SearchSpace {
         }
     }
 
-    pub fn default_gpu_lowlat() -> Self {
+    pub fn default_gpu_lowlat(parameter_domains: ParameterDomains) -> Self {
         // See backends/concrete_cuda/implementation/src/bootstrap_low_latency.cu
-        let glwe_log_polynomial_sizes: Vec<u64> = (8..=14).collect();
+        let glwe_log_polynomial_sizes: Vec<u64> = parameter_domains.glwe_pbs_constrained_gpu.log2_polynomial_size.as_vec();
 
-        let glwe_dimensions: Vec<u64> = DEFAUT_DOMAINS.glwe_pbs_constrained.glwe_dimension.as_vec();
+        let glwe_dimensions: Vec<u64> = parameter_domains.glwe_pbs_constrained_gpu.glwe_dimension.as_vec();
 
-        let internal_lwe_dimensions: Vec<u64> = DEFAUT_DOMAINS.free_glwe.glwe_dimension.as_vec();
-        let levelled_only_lwe_dimensions = DEFAUT_DOMAINS.free_lwe;
+        let internal_lwe_dimensions: Vec<u64> = parameter_domains.free_glwe.glwe_dimension.as_vec();
+        let levelled_only_lwe_dimensions = parameter_domains.free_lwe;
         Self {
             glwe_log_polynomial_sizes,
             glwe_dimensions,
@@ -78,14 +66,14 @@ impl SearchSpace {
         }
     }
 
-    pub fn default_gpu_amortized() -> Self {
+    pub fn default_gpu_amortized(parameter_domains: ParameterDomains) -> Self {
         // See backends/concrete_cuda/implementation/src/bootstrap_amortized.cu
-        let glwe_log_polynomial_sizes: Vec<u64> = (8..=14).collect();
+        let glwe_log_polynomial_sizes: Vec<u64> = parameter_domains.glwe_pbs_constrained_gpu.log2_polynomial_size.as_vec();
 
-        let glwe_dimensions: Vec<u64> = DEFAUT_DOMAINS.glwe_pbs_constrained.glwe_dimension.as_vec();
+        let glwe_dimensions: Vec<u64> = parameter_domains.glwe_pbs_constrained_gpu.glwe_dimension.as_vec();
 
-        let internal_lwe_dimensions: Vec<u64> = DEFAUT_DOMAINS.free_glwe.glwe_dimension.as_vec();
-        let levelled_only_lwe_dimensions = DEFAUT_DOMAINS.free_lwe;
+        let internal_lwe_dimensions: Vec<u64> = parameter_domains.free_glwe.glwe_dimension.as_vec();
+        let levelled_only_lwe_dimensions = parameter_domains.free_lwe;
         Self {
             glwe_log_polynomial_sizes,
             glwe_dimensions,
@@ -93,17 +81,17 @@ impl SearchSpace {
             levelled_only_lwe_dimensions,
         }
     }
-    pub fn default(processing_unit: config::ProcessingUnit, parameter_restrictions: ParameterRestrictions) -> Self {
+    pub fn default(processing_unit: config::ProcessingUnit, parameter_domains: ParameterDomains) -> Self {
         match processing_unit {
-            config::ProcessingUnit::Cpu => Self::default_cpu(parameter_restrictions),
+            config::ProcessingUnit::Cpu => Self::default_cpu(parameter_domains),
             config::ProcessingUnit::Gpu {
                 pbs_type: GpuPbsType::Amortized,
                 ..
-            } => Self::default_gpu_amortized(),
+            } => Self::default_gpu_amortized(parameter_domains),
             config::ProcessingUnit::Gpu {
                 pbs_type: GpuPbsType::Lowlat,
                 ..
-            } => Self::default_gpu_lowlat(),
+            } => Self::default_gpu_lowlat(parameter_domains),
         }
     }
 }

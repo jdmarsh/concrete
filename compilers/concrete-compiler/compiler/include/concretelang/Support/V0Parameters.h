@@ -80,10 +80,6 @@ const concrete_optimizer::Encoding DEFAULT_ENCODING =
 const bool DEFAULT_CACHE_ON_DISK = true;
 const uint32_t DEFAULT_CIPHERTEXT_MODULUS_LOG = 64;
 const uint32_t DEFAULT_FFT_PRECISION = 53;
-const uint64_t DEFAULT_LOG2_POLYNOMIAL_SIZE_MIN = std::numeric_limits<uint64_t>::min();
-const uint64_t DEFAULT_LOG2_POLYNOMIAL_SIZE_MAX = std::numeric_limits<uint64_t>::max();
-const uint64_t DEFAULT_GLWE_DIMENSION_MIN = std::numeric_limits<uint64_t>::min();
-const uint64_t DEFAULT_GLWE_DIMENSION_MAX = std::numeric_limits<uint64_t>::max();
 
 /// The strategy of the crypto optimization
 enum Strategy {
@@ -114,13 +110,6 @@ struct CompositionRule {
 const std::vector<CompositionRule> DEFAULT_COMPOSITION_RULES = {};
 const bool DEFAULT_COMPOSABLE = false;
 
-struct ParameterRestrictions {
-  uint64_t log2_polynomial_size_min;
-  uint64_t log2_polynomial_size_max;
-  uint64_t glwe_dimension_min;
-  uint64_t glwe_dimension_max;
-};
-
 struct Config {
   double p_error;
   double global_p_error;
@@ -135,7 +124,7 @@ struct Config {
   bool cache_on_disk;
   uint32_t ciphertext_modulus_log;
   uint32_t fft_precision;
-  ParameterRestrictions parameter_restrictions;
+  concrete_optimizer::ParameterRestrictions parameter_restrictions;
   std::vector<CompositionRule> composition_rules;
   bool composable;
 };
@@ -153,11 +142,7 @@ const Config DEFAULT_CONFIG = {UNSPECIFIED_P_ERROR,
                                DEFAULT_CACHE_ON_DISK,
                                DEFAULT_CIPHERTEXT_MODULUS_LOG,
                                DEFAULT_FFT_PRECISION,
-                               ParameterRestrictions {
-                                  DEFAULT_LOG2_POLYNOMIAL_SIZE_MIN,
-                                  DEFAULT_LOG2_POLYNOMIAL_SIZE_MAX,
-                                  DEFAULT_GLWE_DIMENSION_MIN,
-                                  DEFAULT_GLWE_DIMENSION_MAX},
+                               concrete_optimizer::ParameterRestrictions {},
                                DEFAULT_COMPOSITION_RULES,
                                DEFAULT_COMPOSABLE};
 
