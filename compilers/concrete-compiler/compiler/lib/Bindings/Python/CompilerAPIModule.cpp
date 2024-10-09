@@ -928,7 +928,6 @@ void mlir::concretelang::python::populateCompilerAPISubmodule(
               std::optional<uint64_t> glwe_dimension_min, std::optional<uint64_t> glwe_dimension_max) {
              if (log2_polynomial_size_min) {
               options.optimizerConfig.parameter_restrictions.glwe_pbs.log2_polynomial_size_min = std::make_shared<uint64_t>(*log2_polynomial_size_min);
-              std::cout << "PYTHON " << *options.optimizerConfig.parameter_restrictions.glwe_pbs.log2_polynomial_size_min << "\n";
              }
              if (log2_polynomial_size_max) {
               options.optimizerConfig.parameter_restrictions.glwe_pbs.log2_polynomial_size_max = std::make_shared<uint64_t>(*log2_polynomial_size_max);
